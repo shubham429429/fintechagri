@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgroMind — AI-Driven Agri-FinTech Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="18" cy="18" r="17" stroke="#D4A017" stroke-width="1.5"/>
+          <path d="M18 28 C18 28 8 20 8 13 C8 9.13 12.48 6 18 6 C23.52 6 28 9.13 28 13 C28 20 18 28 18 28Z" fill="#40916C" opacity="0.9"/>
+          <path d="M18 6 L18 28" stroke="#D4A017" stroke-width="1" stroke-dasharray="2 2"/>
+          <circle cx="18" cy="13" r="3" fill="#D4A017"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">AgroMind</div>
+        <div class="brand-tag">AI Agri-FinTech</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <a class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
+        <span class="nav-icon">⌂</span>
+        <span>Dashboard</span>
+        <span class="nav-badge">3</span>
+      </a>
+
+      <div class="nav-section-label">AI Agents</div>
+      <a class="nav-item" data-page="financial" onclick="navigate('financial')">
+        <span class="nav-icon">₹</span>
+        <span>Financial Advisor</span>
+      </a>
+      <a class="nav-item" data-page="market" onclick="navigate('market')">
+        <span class="nav-icon">⟳</span>
+        <span>Crop Market</span>
+        <span class="nav-dot live"></span>
+      </a>
+      <a class="nav-item" data-page="weather" onclick="navigate('weather')">
+        <span class="nav-icon">◎</span>
+        <span>Soil & Weather</span>
+      </a>
+      <a class="nav-item" data-page="forecast" onclick="navigate('forecast')">
+        <span class="nav-icon">◈</span>
+        <span>Price Forecast</span>
+      </a>
+
+      <div class="nav-section-label">Community</div>
+      <a class="nav-item" data-page="social" onclick="navigate('social')">
+        <span class="nav-icon">◉</span>
+        <span>Social Hub</span>
+        <span class="nav-badge">12</span>
+      </a>
+
+      <div class="nav-section-label">Account</div>
+      <a class="nav-item" data-page="farm" onclick="navigate('farm')">
+        <span class="nav-icon">▣</span>
+        <span>My Farm</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="ai-status">
+        <span class="ai-pulse"></span>
+        <span>3 Agents Active</span>
+      </div>
+      <div class="farmer-card">
+        <div class="farmer-avatar">RS</div>
+        <div>
+          <div class="farmer-name">Ramesh Singh</div>
+          <div class="farmer-location">Nashik, Maharashtra</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN CONTENT ═══ -->
+  <main class="main-content">
+
+    <!-- ─── TOPBAR ─── -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+        <div class="breadcrumb" id="breadcrumb">Dashboard</div>
+      </div>
+      <div class="topbar-center">
+        <div class="price-ticker" id="priceTicker">
+          <span class="ticker-label">LIVE</span>
+          <div class="ticker-scroll">
+            <span class="ticker-item up">Wheat ₹2,240/q ▲1.2%</span>
+            <span class="ticker-item down">Rice ₹1,890/q ▼0.4%</span>
+            <span class="ticker-item up">Soybean ₹4,520/q ▲2.8%</span>
+            <span class="ticker-item up">Cotton ₹6,100/q ▲0.9%</span>
+            <span class="ticker-item down">Onion ₹1,240/q ▼1.7%</span>
+            <span class="ticker-item up">Turmeric ₹9,800/q ▲3.1%</span>
+          </div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-weather">
+          <span>28°C ☁ Nashik</span>
+        </div>
+        <button class="notif-btn">
+          🔔
+          <span class="notif-dot"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ─── PAGES ─── -->
+    <div class="page-container">
+
+      <!-- ════ PAGE: LOGIN ════ -->
+      <section class="page active" id="page-login">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Welcome to AgroMind</h1>
+            <p class="page-subtitle">Sign in to access your personal market dashboard and selling recommendations.</p>
+          </div>
+        </div>
+        <div class="login-grid">
+          <div class="login-card card">
+            <h3 class="card-title">Farmer Login</h3>
+            <p class="card-sub">Use your mobile number and farm key to access the dashboard.</p>
+            <div class="form-row">
+              <label for="loginPhone">Mobile Number</label>
+              <input id="loginPhone" type="tel" placeholder="Enter mobile number" />
+            </div>
+            <div class="form-row">
+              <label for="loginFarmKey">Farm Key</label>
+              <input id="loginFarmKey" type="password" placeholder="Enter farm key" />
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary" onclick="login()" type="button">Sign In</button>
+            </div>
+            <p class="login-note">New farmer? Register with your mandi officer or local extension service.</p>
+          </div>
+          <div class="login-support card">
+            <h3 class="card-title">Market Intelligence Focus</h3>
+            <ul class="support-list">
+              <li>Today's vegetable arrivals and mandi inflow</li>
+              <li>Open/close price tracking for key markets</li>
+              <li>Your farm stock and nearby 100km supply cluster</li>
+              <li>AI-driven transport recommendation to keep prices high</li>
+              <li>Daily sell/hold guidance with risk signals</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════ PAGE: DASHBOARD ════ -->
+      <section class="page" id="page-dashboard">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Good morning, <span id="dashboardName">Farmer</span> <span class="wave">👋</span></h1>
+            <p class="page-subtitle" id="dashboardSubtitle">Your AgroMind market dashboard is ready.</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-ghost" onclick="logout()">Logout</button>
+            <button class="btn btn-ghost">Export Report</button>
+            <button class="btn btn-primary" onclick="navigate('financial')">Ask AI Advisor</button>
+          </div>
+        </div>
+        <div class="market-signal-grid">
+          <div class="signal-card">
+            <div class="signal-title">Today's Onion Supply</div>
+            <div class="signal-value" id="supplyTodayQty">4,200 q</div>
+            <div class="signal-text" id="supplyTodayDetail">Arrivals at Lasalgaon today</div>
+          </div>
+          <div class="signal-card">
+            <div class="signal-title">Market Open / Close Price</div>
+            <div class="signal-line">Open: <strong id="priceOpen">₹1,320</strong></div>
+            <div class="signal-line">Close: <strong id="priceClose">₹1,240</strong></div>
+            <div class="signal-text" id="priceTrendText">Predicted close based on arrival pressure</div>
+          </div>
+          <div class="signal-card">
+            <div class="signal-title">Your Onion Stock</div>
+            <div class="signal-value" id="farmStockQty">180 q</div>
+            <div class="signal-text" id="farmStockDetail">Available on farm and in storage</div>
+          </div>
+          <div class="signal-card">
+            <div class="signal-title">Nearby 100km Stock</div>
+            <div class="signal-value" id="clusterStockQty">28,400 q</div>
+            <div class="signal-text" id="clusterStockDetail">Total supply from nearby farmers</div>
+          </div>
+          <div class="signal-card recommendation-card">
+            <div class="signal-title">Today’s Transport Advisory</div>
+            <div class="signal-value" id="transportQty">70 q</div>
+            <div class="signal-text" id="transportDetail">Move this amount today for highest price realization.</div>
+            <div class="recommendation-badge" id="recommendationBadge">Partial Sell</div>
+          </div>
+        </div>
+
+        <div class="forecast-card card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Onion Forecast Snapshot</h3>
+              <p class="card-sub">AI predicted arrivals and price direction for the next 7 days.</p>
+            </div>
+            <button class="btn btn-xs btn-ghost" onclick="navigate('forecast')">Full Forecast</button>
+          </div>
+          <div class="forecast-list" id="forecastList"></div>
+        </div>
+
+        <!-- AI Insight Banner -->
+        <div class="ai-insight-banner">
+          <div class="insight-icon">⚡</div>
+          <div class="insight-content">
+            <span class="insight-tag">AI Alert</span>
+            <strong>Onion prices at 3-month low.</strong> Your Crop Selling Agent recommends holding 60% stock for 12–18 days based on arrival data from Lasalgaon mandi. Expected price recovery: ₹1,480–1,620/q.
+          </div>
+          <button class="btn btn-sm btn-amber" onclick="navigate('market')">View Strategy →</button>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Estimated Crop Value</div>
+            <div class="kpi-value">₹3,42,000</div>
+            <div class="kpi-delta up">↑ 12% vs last season</div>
+            <div class="kpi-sparkline">
+              <canvas id="sparkline1" width="100" height="30"></canvas>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Monthly Savings Target</div>
+            <div class="kpi-value">₹8,200</div>
+            <div class="kpi-progress-wrap">
+              <div class="kpi-progress-bar" style="width: 68%"></div>
+            </div>
+            <div class="kpi-delta">₹5,576 saved (68%)</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Best Market Price Today</div>
+            <div class="kpi-value">₹2,480<span>/q</span></div>
+            <div class="kpi-delta up">↑ Pune APMC for Wheat</div>
+            <div class="kpi-sub">+₹240 above your nearest mandi</div>
+          </div>
+          <div class="kpi-card accent-card">
+            <div class="kpi-label">AI Recommendations</div>
+            <div class="kpi-value">7</div>
+            <div class="kpi-delta">Pending your review</div>
+            <div class="kpi-actions">
+              <button class="btn btn-xs btn-amber">Review All</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="dashboard-grid">
+
+          <!-- Price Chart -->
+          <div class="card chart-card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Onion Price Trend — Lasalgaon</h3>
+                <p class="card-sub">30-day historical + 14-day AI forecast</p>
+              </div>
+              <div class="chart-tabs">
+                <button class="chart-tab active">30D</button>
+                <button class="chart-tab">90D</button>
+                <button class="chart-tab">1Y</button>
+              </div>
+            </div>
+            <canvas id="priceChart" height="100"></canvas>
+          </div>
+
+          <!-- Upcoming Actions -->
+          <div class="card actions-card">
+            <div class="card-header">
+              <h3 class="card-title">AI Action Plan</h3>
+              <span class="card-tag">This Week</span>
+            </div>
+            <ul class="action-list">
+              <li class="action-item high">
+                <div class="action-priority">HIGH</div>
+                <div class="action-body">
+                  <div class="action-title">Sell 20 quintals Wheat now</div>
+                  <div class="action-desc">Pune APMC open — ₹2,480/q. Transport cost: ₹1,200. Net gain: ₹47,400</div>
+                </div>
+                <button class="btn btn-xs btn-outline">View</button>
+              </li>
+              <li class="action-item medium">
+                <div class="action-priority">MED</div>
+                <div class="action-body">
+                  <div class="action-title">Apply PM-Kisan Q3 installment</div>
+                  <div class="action-desc">₹2,000 due. Last date: May 15. 1-click apply available.</div>
+                </div>
+                <button class="btn btn-xs btn-outline">Apply</button>
+              </li>
+              <li class="action-item low">
+                <div class="action-priority">LOW</div>
+                <div class="action-body">
+                  <div class="action-title">Review crop insurance renewal</div>
+                  <div class="action-desc">PMFBY kharif policy. Premium: ₹3,200 for 4 acres Soybean.</div>
+                </div>
+                <button class="btn btn-xs btn-outline">Review</button>
+              </li>
+              <li class="action-item low">
+                <div class="action-priority">LOW</div>
+                <div class="action-body">
+                  <div class="action-title">Update savings plan for Rabi</div>
+                  <div class="action-desc">AI detected ₹12,000 surplus from last harvest. Allocate?</div>
+                </div>
+                <button class="btn btn-xs btn-outline">Plan</button>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Financial Summary -->
+          <div class="card fin-card">
+            <div class="card-header">
+              <h3 class="card-title">Financial Snapshot</h3>
+              <span class="card-tag">Kharif 2025–26</span>
+            </div>
+            <div class="fin-grid">
+              <div class="fin-item">
+                <span class="fin-label">Input Costs</span>
+                <span class="fin-value cost">₹68,400</span>
+              </div>
+              <div class="fin-item">
+                <span class="fin-label">Revenue (sold)</span>
+                <span class="fin-value income">₹1,24,000</span>
+              </div>
+              <div class="fin-item">
+                <span class="fin-label">Pending Sale</span>
+                <span class="fin-value pending">₹2,18,000</span>
+              </div>
+              <div class="fin-item">
+                <span class="fin-label">Net Profit (est.)</span>
+                <span class="fin-value profit">₹2,73,600</span>
+              </div>
+            </div>
+            <div class="fin-bar-wrap">
+              <div class="fin-bar-label">Season Progress</div>
+              <div class="fin-bar">
+                <div class="fin-bar-fill cost-fill" style="width:22%" title="Costs"></div>
+                <div class="fin-bar-fill income-fill" style="width:40%" title="Earned"></div>
+                <div class="fin-bar-fill pending-fill" style="width:38%" title="Pending"></div>
+              </div>
+              <div class="fin-bar-legend">
+                <span><i class="dot cost-dot"></i>Costs</span>
+                <span><i class="dot income-dot"></i>Earned</span>
+                <span><i class="dot pending-dot"></i>Pending</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Community Snapshot -->
+          <div class="card community-card">
+            <div class="card-header">
+              <h3 class="card-title">Community Pulse</h3>
+              <a class="card-link" onclick="navigate('social')">View Hub →</a>
+            </div>
+            <div class="community-insights">
+              <div class="insight-pill">
+                <span class="pill-emoji">🌧️</span>
+                <span>42 farmers in Nashik district report delayed pre-monsoon rainfall</span>
+              </div>
+              <div class="insight-pill">
+                <span class="pill-emoji">📦</span>
+                <span>Group buying for fertilizers — 18 farmers joined. Save ₹1,200/bag</span>
+              </div>
+              <div class="insight-pill">
+                <span class="pill-emoji">💡</span>
+                <span>Top tip this week: Drip irrigation reduced water use by 40% — shared by Suresh Patil</span>
+              </div>
+            </div>
+            <div class="community-stats">
+              <div class="cs-stat">
+                <span class="cs-num">284</span>
+                <span class="cs-lab">Farmers Online</span>
+              </div>
+              <div class="cs-stat">
+                <span class="cs-num">17</span>
+                <span class="cs-lab">Active Groups</span>
+              </div>
+              <div class="cs-stat">
+                <span class="cs-num">6</span>
+                <span class="cs-lab">AI Insights Today</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ════ PAGE: FINANCIAL ADVISOR ════ -->
+      <section class="page" id="page-financial">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Financial Advisor Agent</h1>
+            <p class="page-subtitle">Ask anything about savings, budgeting, loans, and government schemes.</p>
+          </div>
+          <div class="agent-status">
+            <span class="ai-pulse"></span>
+            <span>Agent Online · Mistral 7B (AgriFinance v1.2)</span>
+          </div>
+        </div>
+
+        <div class="chat-layout">
+          <!-- Chat Window -->
+          <div class="chat-panel">
+            <div class="chat-messages" id="chatMessages">
+              <div class="chat-msg agent-msg">
+                <div class="msg-avatar agent-avatar">AI</div>
+                <div class="msg-bubble">
+                  <div class="msg-sender">Financial Advisor</div>
+                  <p>Namaste Ramesh! I'm your AI Financial Advisor. Based on your farm profile — 4 acres in Nashik, growing Onion and Wheat — I've prepared a seasonal financial summary. How can I help you today?</p>
+                  <div class="quick-chips">
+                    <button class="chip" onclick="sendQuickMsg('Show my savings plan')">📊 Savings Plan</button>
+                    <button class="chip" onclick="sendQuickMsg('What government schemes am I eligible for?')">🏛 Schemes</button>
+                    <button class="chip" onclick="sendQuickMsg('How much loan can I get?')">💳 Loan Eligibility</button>
+                    <button class="chip" onclick="sendQuickMsg('Help me plan Kharif budget')">🌱 Kharif Budget</button>
+                  </div>
+                  <div class="msg-time">9:02 AM</div>
+                </div>
+              </div>
+
+              <div class="chat-msg user-msg">
+                <div class="msg-bubble">
+                  <div class="msg-sender">You</div>
+                  <p>I want to save money for my daughter's college in 3 years. How should I plan?</p>
+                  <div class="msg-time">9:05 AM</div>
+                </div>
+                <div class="msg-avatar user-avatar">RS</div>
+              </div>
+
+              <div class="chat-msg agent-msg">
+                <div class="msg-avatar agent-avatar">AI</div>
+                <div class="msg-bubble">
+                  <div class="msg-sender">Financial Advisor</div>
+                  <p>Great goal, Ramesh! Based on your farm income pattern, here's a 3-year education savings plan:</p>
+                  <div class="ai-plan-card">
+                    <div class="plan-title">📋 Education Fund Plan — 36 Months</div>
+                    <div class="plan-row"><span>Target Amount</span><strong>₹3,00,000</strong></div>
+                    <div class="plan-row"><span>Monthly Saving</span><strong>₹7,200</strong></div>
+                    <div class="plan-row"><span>Post-Harvest Lump Sum</span><strong>₹40,000/year</strong></div>
+                    <div class="plan-row"><span>Recommended Instrument</span><strong>Post Office RD + KVP</strong></div>
+                    <div class="plan-row highlight"><span>Projected Value at 36M</span><strong>₹3,18,400</strong></div>
+                  </div>
+                  <p style="margin-top:10px; font-size:0.85rem; opacity:0.8;">💡 Your Rabi wheat harvest surplus (~₹85,000) can fund the first year's lump sum completely. Shall I create a detailed month-by-month plan?</p>
+                  <div class="msg-time">9:05 AM · 1.8s response</div>
+                </div>
+              </div>
+
+              <div class="typing-indicator" id="typingIndicator" style="display:none">
+                <div class="msg-avatar agent-avatar">AI</div>
+                <div class="typing-bubble">
+                  <span></span><span></span><span></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="chat-input-area">
+              <div class="chat-input-wrap">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Ask about savings, loans, schemes, budgets..." onkeydown="if(event.key==='Enter') sendMessage()" />
+                <div class="chat-controls">
+                  <button class="ctrl-btn" title="Voice input">🎙</button>
+                  <button class="ctrl-btn" title="Upload document">📎</button>
+                  <button class="send-btn" onclick="sendMessage()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="chat-disclaimer">AI advice is for guidance only. Consult a certified financial advisor for major decisions.</div>
+            </div>
+          </div>
+
+          <!-- Side Panel -->
+          <div class="chat-sidebar">
+            <div class="cs-section">
+              <h4>My Financial Profile</h4>
+              <div class="profile-row"><span>Land</span><strong>4 Acres</strong></div>
+              <div class="profile-row"><span>Primary Crop</span><strong>Onion, Wheat</strong></div>
+              <div class="profile-row"><span>Avg. Annual Income</span><strong>₹4.2 Lakhs</strong></div>
+              <div class="profile-row"><span>Bank Account</span><strong>✓ Linked</strong></div>
+              <div class="profile-row"><span>Credit Score</span><strong>672 (Fair)</strong></div>
+              <div class="profile-row"><span>Active Loan</span><strong>None</strong></div>
+            </div>
+            <div class="cs-section">
+              <h4>Eligible Schemes</h4>
+              <div class="scheme-tag">PM-Kisan ✓ Active</div>
+              <div class="scheme-tag eligible">KCC — Apply Now</div>
+              <div class="scheme-tag eligible">PMFBY Insurance</div>
+              <div class="scheme-tag">Soil Health Card ✓</div>
+            </div>
+            <div class="cs-section">
+              <h4>Conversation History</h4>
+              <div class="history-item">📝 Rabi Budget Plan · Apr 20</div>
+              <div class="history-item">📝 Loan Eligibility · Apr 12</div>
+              <div class="history-item">📝 KCC Application · Mar 28</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════ PAGE: CROP MARKET ════ -->
+      <section class="page" id="page-market">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Crop Market Agent</h1>
+            <p class="page-subtitle">Live prices, buyer matching, and AI-optimized selling strategies.</p>
+          </div>
+          <div class="page-actions">
+            <div class="live-badge">● LIVE</div>
+            <button class="btn btn-primary">Set Price Alert</button>
+          </div>
+        </div>
+
+        <!-- Top Reco -->
+        <div class="reco-banner">
+          <div class="reco-rank">#1 BEST SELL NOW</div>
+          <div class="reco-body">
+            <div class="reco-crop">🌾 Wheat · 20 Quintals</div>
+            <div class="reco-detail">Pune APMC · ₹2,480/q · 84 km · Net ₹47,400</div>
+          </div>
+          <div class="reco-meta">
+            <div class="reco-score">AI Score <strong>94/100</strong></div>
+            <button class="btn btn-amber">Get Directions & Contact</button>
+          </div>
+        </div>
+
+        <div class="market-grid">
+
+          <!-- Market Price Table -->
+          <div class="card market-table-card">
+            <div class="card-header">
+              <h3 class="card-title">Live Mandi Prices — Onion</h3>
+              <select class="select-crop">
+                <option>Onion</option>
+                <option>Wheat</option>
+                <option>Soybean</option>
+                <option>Cotton</option>
+              </select>
+            </div>
+            <table class="market-table">
+              <thead>
+                <tr>
+                  <th>Mandi</th>
+                  <th>Modal Price</th>
+                  <th>Min/Max</th>
+                  <th>Arrivals</th>
+                  <th>Distance</th>
+                  <th>AI Rec.</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="best-row">
+                  <td><strong>Lasalgaon</strong><span class="mandi-state">MH</span></td>
+                  <td class="price up">₹1,340</td>
+                  <td class="price-range">1,100 – 1,580</td>
+                  <td>4,200 q</td>
+                  <td>22 km</td>
+                  <td><span class="rec-tag hold">HOLD</span></td>
+                </tr>
+                <tr>
+                  <td>Pune APMC<span class="mandi-state">MH</span></td>
+                  <td class="price up">₹1,420</td>
+                  <td class="price-range">1,200 – 1,620</td>
+                  <td>2,800 q</td>
+                  <td>168 km</td>
+                  <td><span class="rec-tag sell">SELL 30%</span></td>
+                </tr>
+                <tr>
+                  <td>Solapur<span class="mandi-state">MH</span></td>
+                  <td class="price down">₹1,180</td>
+                  <td class="price-range">980 – 1,350</td>
+                  <td>3,100 q</td>
+                  <td>145 km</td>
+                  <td><span class="rec-tag avoid">AVOID</span></td>
+                </tr>
+                <tr>
+                  <td>Hubli<span class="mandi-state">KA</span></td>
+                  <td class="price up">₹1,480</td>
+                  <td class="price-range">1,300 – 1,640</td>
+                  <td>1,900 q</td>
+                  <td>240 km</td>
+                  <td><span class="rec-tag hold">WATCH</span></td>
+                </tr>
+                <tr>
+                  <td>Belgaum FPO<span class="mandi-state">KA</span></td>
+                  <td class="price up">₹1,520</td>
+                  <td class="price-range">1,480 – 1,560</td>
+                  <td>Pool</td>
+                  <td>280 km</td>
+                  <td><span class="rec-tag sell">POOL</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Sell Strategy Panel -->
+          <div class="card strategy-card">
+            <div class="card-header">
+              <h3 class="card-title">AI Selling Strategy</h3>
+              <span class="card-tag">Onion · 40q stock</span>
+            </div>
+            <div class="strategy-breakdown">
+              <div class="strategy-item">
+                <div class="s-num">①</div>
+                <div class="s-body">
+                  <div class="s-title">Sell 12q at Pune APMC <span class="s-timing">This Week</span></div>
+                  <div class="s-detail">Expected: ₹17,040 · Transport: ₹2,100 · Net: ₹14,940</div>
+                </div>
+              </div>
+              <div class="strategy-item">
+                <div class="s-num">②</div>
+                <div class="s-body">
+                  <div class="s-title">Pool 18q with FPO Belgaum <span class="s-timing">In 10 Days</span></div>
+                  <div class="s-detail">Projected: ₹27,360 · Collection service available · Net: ₹26,100</div>
+                </div>
+              </div>
+              <div class="strategy-item">
+                <div class="s-num">③</div>
+                <div class="s-body">
+                  <div class="s-title">Hold 10q for 18 days <span class="s-timing">Watch Price</span></div>
+                  <div class="s-detail">AI forecast: ₹1,580–1,640/q if monsoon delayed. Set alert at ₹1,500</div>
+                </div>
+              </div>
+            </div>
+            <div class="strategy-total">
+              <span>Total Estimated Realization</span>
+              <strong>₹68,040</strong>
+            </div>
+            <div class="negotiation-box">
+              <div class="neg-label">AI Negotiation Script</div>
+              <p class="neg-text">"Modal price today is ₹1,340 at Lasalgaon. Your target: ₹1,480. Open at ₹1,550, walk away below ₹1,380."</p>
+            </div>
+          </div>
+
+          <!-- Verified Buyers -->
+          <div class="card buyers-card">
+            <div class="card-header">
+              <h3 class="card-title">Verified Buyers</h3>
+              <span class="card-tag">Near You</span>
+            </div>
+            <div class="buyer-list">
+              <div class="buyer-item">
+                <div class="buyer-avatar">SF</div>
+                <div class="buyer-body">
+                  <div class="buyer-name">Sahyadri Farms Export</div>
+                  <div class="buyer-detail">Nashik · Pays ₹1,400–1,600/q · Direct pickup · Export quality</div>
+                </div>
+                <button class="btn btn-xs btn-outline">Contact</button>
+              </div>
+              <div class="buyer-item">
+                <div class="buyer-avatar">RE</div>
+                <div class="buyer-body">
+                  <div class="buyer-name">Reliance Retail Agri</div>
+                  <div class="buyer-detail">Pune · ₹1,380/q fixed · 2-day payment · Min 50q</div>
+                </div>
+                <button class="btn btn-xs btn-outline">Contact</button>
+              </div>
+              <div class="buyer-item">
+                <div class="buyer-avatar">NK</div>
+                <div class="buyer-body">
+                  <div class="buyer-name">Nashik Cooperative</div>
+                  <div class="buyer-detail">Local · Pool pricing · Weekly settlement · Membership req.</div>
+                </div>
+                <button class="btn btn-xs btn-amber">Join Pool</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ════ PAGE: WEATHER / SOIL ════ -->
+      <section class="page" id="page-weather">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Soil & Weather Agent</h1>
+            <p class="page-subtitle">Satellite-powered field intelligence for Nashik, Maharashtra.</p>
+          </div>
+        </div>
+        <div class="weather-grid">
+          <div class="card weather-main">
+            <div class="weather-hero">
+              <div class="w-location">📍 Nashik District, Maharashtra</div>
+              <div class="w-temp">28°C</div>
+              <div class="w-desc">Partly Cloudy — Low Monsoon Probability</div>
+              <div class="w-stats">
+                <div class="w-stat"><span>Humidity</span><strong>62%</strong></div>
+                <div class="w-stat"><span>Wind</span><strong>14 km/h</strong></div>
+                <div class="w-stat"><span>UV Index</span><strong>7 (High)</strong></div>
+                <div class="w-stat"><span>Rainfall (Apr)</span><strong>2.4mm</strong></div>
+              </div>
+            </div>
+            <div class="forecast-row">
+              <div class="fc-day"><span>Mon</span><span>☀</span><span>31°</span></div>
+              <div class="fc-day"><span>Tue</span><span>⛅</span><span>29°</span></div>
+              <div class="fc-day active-day"><span>Wed</span><span>🌧</span><span>26°</span></div>
+              <div class="fc-day"><span>Thu</span><span>🌧</span><span>24°</span></div>
+              <div class="fc-day"><span>Fri</span><span>⛅</span><span>27°</span></div>
+              <div class="fc-day"><span>Sat</span><span>☀</span><span>30°</span></div>
+              <div class="fc-day"><span>Sun</span><span>☀</span><span>32°</span></div>
+            </div>
+          </div>
+          <div class="card soil-card">
+            <div class="card-header"><h3 class="card-title">Soil Health</h3><span class="card-tag">Field A — 2.5 Acres</span></div>
+            <div class="soil-grid">
+              <div class="soil-item"><div class="soil-bar-wrap"><div class="soil-bar" style="width:72%; background:#40916C"></div></div><span>Nitrogen</span><strong>72%</strong></div>
+              <div class="soil-item"><div class="soil-bar-wrap"><div class="soil-bar" style="width:55%; background:#D4A017"></div></div><span>Phosphorus</span><strong>55%</strong></div>
+              <div class="soil-item"><div class="soil-bar-wrap"><div class="soil-bar" style="width:88%; background:#40916C"></div></div><span>Potassium</span><strong>88%</strong></div>
+              <div class="soil-item"><div class="soil-bar-wrap"><div class="soil-bar" style="width:40%; background:#E05C5C"></div></div><span>Organic C</span><strong>40%</strong></div>
+            </div>
+            <div class="soil-alert">⚠ Low Organic Carbon detected. AI recommends 2 ton/acre farmyard manure before Kharif sowing.</div>
+          </div>
+          <div class="card advisory-card">
+            <div class="card-header"><h3 class="card-title">AI Crop Advisory</h3></div>
+            <div class="advisory-list">
+              <div class="adv-item green">✓ Optimal sowing window: May 15–28 for Soybean</div>
+              <div class="adv-item amber">⚠ Pest Alert: Thrips risk HIGH for Onion (next 7 days)</div>
+              <div class="adv-item green">✓ Irrigation: Skip next 3 days (rain forecast)</div>
+              <div class="adv-item amber">⚠ Apply fungicide before Wednesday rains</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════ PAGE: FORECAST ════ -->
+      <section class="page" id="page-forecast">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Price Forecast Agent</h1>
+            <p class="page-subtitle">30/60/90-day AI price predictions powered by Prophet + XGBoost ensemble.</p>
+          </div>
+        </div>
+        <div class="forecast-grid">
+          <div class="card full-width">
+            <div class="card-header">
+              <h3 class="card-title">Onion Price Forecast — Lasalgaon</h3>
+              <div class="model-badge">Model: Prophet+XGB · MAPE 9.2%</div>
+            </div>
+            <canvas id="forecastChart" height="80"></canvas>
+          </div>
+          <div class="card">
+            <h3 class="card-title">30-Day Outlook</h3>
+            <div class="forecast-box">
+              <div class="fc-price">₹1,480 – ₹1,640</div>
+              <div class="fc-conf">Confidence: 78%</div>
+              <div class="fc-driver">Key drivers: Pre-monsoon supply crunch, Nashik arrivals declining 18%</div>
+            </div>
+          </div>
+          <div class="card">
+            <h3 class="card-title">60-Day Outlook</h3>
+            <div class="forecast-box">
+              <div class="fc-price">₹1,200 – ₹1,400</div>
+              <div class="fc-conf">Confidence: 64%</div>
+              <div class="fc-driver">Key drivers: New Kharif arrivals expected July. Import pressure from Pakistan route.</div>
+            </div>
+          </div>
+          <div class="card">
+            <h3 class="card-title">90-Day Outlook</h3>
+            <div class="forecast-box">
+              <div class="fc-price">₹900 – ₹1,200</div>
+              <div class="fc-conf">Confidence: 51%</div>
+              <div class="fc-driver">Key drivers: Post-monsoon glut historically. Storage advisory: sell before Sept.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════ PAGE: SOCIAL HUB ════ -->
+      <section class="page" id="page-social">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Social Collaboration Hub</h1>
+            <p class="page-subtitle">Connect, share, and learn with 284 farmers in your community.</p>
+          </div>
+          <button class="btn btn-primary">+ New Post</button>
+        </div>
+
+        <div class="social-layout">
+          <!-- Feed -->
+          <div class="social-feed">
+
+            <!-- AI Weekly Brief -->
+            <div class="post-card ai-post">
+              <div class="post-header">
+                <div class="post-avatar ai-post-avatar">AI</div>
+                <div>
+                  <div class="post-author">AgroMind Intelligence</div>
+                  <div class="post-meta">Weekly Community Brief · April 27, 2026</div>
+                </div>
+                <span class="verified-badge">✦ AI</span>
+              </div>
+              <div class="post-body">
+                <strong>📊 This Week in Nashik District:</strong><br/>
+                Onion arrivals at Lasalgaon down 22% vs last week. Community sentiment: 68% farmers planning to hold stock. Average mandi realization this week: ₹1,280/q. 3 new FPO opportunities detected. Recommended group action: bulk sell coordination Thursday.
+              </div>
+              <div class="post-actions">
+                <button class="post-action">👍 142</button>
+                <button class="post-action">💬 38 Comments</button>
+                <button class="post-action">↗ Share</button>
+              </div>
+            </div>
+
+            <!-- Farmer Post -->
+            <div class="post-card">
+              <div class="post-header">
+                <div class="post-avatar">SP</div>
+                <div>
+                  <div class="post-author">Suresh Patil</div>
+                  <div class="post-meta">Chandwad, Nashik · 3 hours ago</div>
+                </div>
+                <span class="crop-tag">Onion</span>
+              </div>
+              <div class="post-body">
+                Got ₹1,480/q at Lasalgaon today by reaching before 8am when premium buyers arrive. Tips: Grade your onions by size (50mm+ gets 15-20% premium). Anyone else trying early morning selling?
+              </div>
+              <div class="ai-comment">
+                <span class="ai-tag">AI Insight</span>
+                Early arrival strategy aligns with market data — first 20% of daily arrivals typically get 12–18% higher prices at Lasalgaon. Replicated across 340 similar posts in this community.
+              </div>
+              <div class="post-actions">
+                <button class="post-action">👍 89</button>
+                <button class="post-action">💬 24</button>
+                <button class="post-action">↗ Share</button>
+              </div>
+            </div>
+
+            <!-- Another Post -->
+            <div class="post-card">
+              <div class="post-header">
+                <div class="post-avatar">MK</div>
+                <div>
+                  <div class="post-author">Mahesh Kolhe</div>
+                  <div class="post-meta">Dindori, Nashik · 6 hours ago</div>
+                </div>
+                <span class="crop-tag">Wheat</span>
+              </div>
+              <div class="post-body">
+                ⚠ Warning to all: A buyer called "Sai Traders" in Pimpalgaon offered ₹1,800/q but asked for 50% advance from us. DO NOT pay. Looks like a scam. Report to local police.
+              </div>
+              <div class="ai-comment">
+                <span class="ai-tag red-tag">AI Safety Alert</span>
+                "Sai Traders" not in our verified buyer database. Pattern matches 3 reported fraud cases in district. AgroMind has flagged this to our fraud monitoring team.
+              </div>
+              <div class="post-actions">
+                <button class="post-action">👍 201</button>
+                <button class="post-action">💬 67</button>
+                <button class="post-action">🚨 Report</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Sidebar -->
+          <div class="social-sidebar">
+            <div class="card ss-card">
+              <h4>Your Groups</h4>
+              <div class="group-item"><span>🌾</span><span>Nashik Onion Growers</span><span class="g-count">142</span></div>
+              <div class="group-item"><span>💧</span><span>Drip Irrigation Network</span><span class="g-count">78</span></div>
+              <div class="group-item"><span>🌿</span><span>Organic Farmers Nashik</span><span class="g-count">34</span></div>
+              <button class="btn btn-ghost btn-full">+ Find Groups</button>
+            </div>
+            <div class="card ss-card">
+              <h4>Trending Topics</h4>
+              <div class="trend-item">#OnionPrice · 284 posts</div>
+              <div class="trend-item">#MonsoonDelay · 198 posts</div>
+              <div class="trend-item">#FPOPooling · 156 posts</div>
+              <div class="trend-item">#KCCLoan · 89 posts</div>
+            </div>
+            <div class="card ss-card">
+              <h4>Connect With</h4>
+              <div class="connect-farmer"><div class="cf-avatar">RP</div><div><div class="cf-name">Rajesh Pawar</div><div class="cf-crop">Grape, Nashik</div></div><button class="btn btn-xs btn-outline">+</button></div>
+              <div class="connect-farmer"><div class="cf-avatar">AS</div><div><div class="cf-name">Anita Shinde</div><div class="cf-crop">Pomegranate, Solapur</div></div><button class="btn btn-xs btn-outline">+</button></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════ PAGE: MY FARM ════ -->
+      <section class="page" id="page-farm">
+        <div class="page-header">
+          <h1 class="page-title">My Farm Profile</h1>
+        </div>
+        <div class="farm-grid">
+          <div class="card farm-profile-card">
+            <div class="farmer-hero">
+              <div class="farmer-hero-avatar">RS</div>
+              <div>
+                <h2>Ramesh Singh</h2>
+                <p>Nashik, Maharashtra · Member since Jan 2025</p>
+                <div class="farmer-tags">
+                  <span class="ftag">🌾 Wheat</span>
+                  <span class="ftag">🧅 Onion</span>
+                  <span class="ftag">4 Acres</span>
+                  <span class="ftag">PM-Kisan ✓</span>
+                </div>
+              </div>
+            </div>
+            <div class="farm-stats-row">
+              <div class="farm-stat"><span>7</span><small>AI Sessions</small></div>
+              <div class="farm-stat"><span>₹68K</span><small>Income Improved</small></div>
+              <div class="farm-stat"><span>3</span><small>Schemes Applied</small></div>
+              <div class="farm-stat"><span>284</span><small>Community Rank</small></div>
+            </div>
+          </div>
+          <div class="card stock-detail-card">
+            <div class="card-header">
+              <h3 class="card-title">Personal Stock Tracking</h3>
+              <button class="btn btn-xs btn-ghost" onclick="navigate('market')">Market Advice</button>
+            </div>
+            <div class="stock-summary">
+              <div class="stock-row"><span>Total Onion Stock</span><strong id="stockTotalOnion">180 q</strong></div>
+              <div class="stock-row"><span>Projected Sell Value</span><strong id="stockProjectedValue">₹81,000</strong></div>
+              <div class="stock-row"><span>Storage Location</span><strong id="stockStorageLocation">Nashik Cold Storage</strong></div>
+            </div>
+            <table class="stock-table" id="farmStockTable">
+              <thead>
+                <tr><th>Crop</th><th>Qty</th><th>Quality</th><th>Storage</th><th>Value</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="card">
+            <h3 class="card-title">Language & Preferences</h3>
+            <div class="pref-row"><span>Language</span><select class="select-crop"><option>Hindi</option><option>Marathi</option><option>English</option></select></div>
+            <div class="pref-row"><span>Notifications</span><select class="select-crop"><option>SMS + App</option><option>App Only</option><option>WhatsApp</option></select></div>
+            <div class="pref-row"><span>Price Alerts</span><select class="select-crop"><option>Enabled</option><option>Disabled</option></select></div>
+          </div>
+          <div class="card">
+            <h3 class="card-title">Linked Services</h3>
+            <div class="linked-row"><span>Bank Account</span><span class="linked-yes">✓ SBI Nashik</span></div>
+            <div class="linked-row"><span>Aadhaar</span><span class="linked-yes">✓ Verified</span></div>
+            <div class="linked-row"><span>PM-Kisan</span><span class="linked-yes">✓ Active</span></div>
+            <div class="linked-row"><span>Soil Health Card</span><span class="linked-no">Link →</span></div>
+            <div class="linked-row"><span>KCC Loan</span><span class="linked-no">Apply →</span></div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
