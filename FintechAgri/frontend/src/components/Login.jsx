@@ -1,60 +1,75 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import useAuthStore from '../stores/authStore';
 
-const Login = ({ onLogin }) => {
+export default function Login() {
   const [phone, setPhone] = useState('');
-  const [key, setKey] = useState('');
-  const [error, setError] = useState('');
+  const [password, setPassword] = useState('');
+  const { login, loading, error, clearError } = useAuthStore();
+  const navigate = useNavigate();
 
-  const handleLogin = () => {
-    if (!phone || !key) {
-      setError('Please enter both mobile number and farm key.');
-      return;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    clearError();
+    try {
+      await login(phone, password);
+      navigate('/dashboard');
+    } catch {
+      // error is set in store
     }
-    // Simulate login success
-    onLogin({ name: 'Ramesh Singh', phone });
   };
 
   return (
-    <section className="page active" id="page-login" data-testid="login-page">
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Welcome to AgroMind</h1>
-          <p className="page-subtitle">Sign in to access your personal market dashboard and selling recommendations.</p>
+    <div className="login-page">
+      <div className="login-page-card">
+        <div className="login-header">
+          <div className="login-logo">🌾</div>
+          <h1 className="login-title">AgroMind</h1>
+          <p className="login-subtitle">Agricultural Intelligence Platform</p>
         </div>
-      </div>
-      <div className="login-grid">
-        <div className="login-card card">
-          <h3 className="card-title">Farmer Login</h3>
-          {error && <div style={{color: 'red', marginBottom: '10px'}} data-testid="login-error">{error}</div>}
+
+        {error && (
+          <div className="alert-banner error">⚠️ {error}</div>
+        )}
+
+        <form onSubmit={handleSubmit}>
           <div className="form-row">
-            <label htmlFor="loginPhone">Mobile Number</label>
-            <input 
-              id="loginPhone" 
-              type="tel" 
-              placeholder="Enter mobile number" 
+            <label>Phone Number</label>
+            <input
+              type="tel"
+              placeholder="Enter 10-digit phone number"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              data-testid="input-phone"
+              required
+              maxLength={10}
             />
           </div>
+
           <div className="form-row">
-            <label htmlFor="loginFarmKey">Farm Key</label>
-            <input 
-              id="loginFarmKey" 
-              type="password" 
-              placeholder="Enter farm key" 
-              value={key}
-              onChange={(e) => setKey(e.target.value)}
-              data-testid="input-key"
+            <label>Password</label>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={4}
             />
           </div>
-          <div className="form-actions">
-            <button className="btn btn-primary" onClick={handleLogin} type="button" data-testid="btn-login">Sign In</button>
-          </div>
+
+          <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
+            {loading ? '⏳ Signing in...' : '🚀 Sign In'}
+          </button>
+        </form>
+
+        <p className="login-note" style={{ textAlign: 'center', marginTop: '1rem' }}>
+          Don't have an account? <Link to="/register" style={{ color: 'var(--c-primary)', fontWeight: 600 }}>Register here</Link>
+        </p>
+
+        <div className="demo-credentials">
+          <strong>Demo:</strong> Phone: 9999999999 &nbsp;|&nbsp; Password: demo123
         </div>
       </div>
-    </section>
+    </div>
   );
-};
-
-export default Login;
+}

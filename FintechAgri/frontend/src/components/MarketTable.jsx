@@ -1,48 +1,50 @@
-import React from 'react';
+export default function MarketTable({ data }) {
+  if (!data || data.length === 0) {
+    return <p className="empty-msg">No market data available</p>;
+  }
 
-const MarketTable = ({ data }) => {
-  if (!data || data.length === 0) return <div>No market data available</div>;
+  const latestByMandi = {};
+  data.forEach((item) => {
+    const key = item.mandi;
+    if (!latestByMandi[key] || new Date(item.date) > new Date(latestByMandi[key].date)) {
+      latestByMandi[key] = item;
+    }
+  });
+  const rows = Object.values(latestByMandi);
 
   return (
-    <table className="market-table">
-      <thead>
-        <tr>
-          <th>Mandi</th>
-          <th>Modal Price</th>
-          <th>Min/Max</th>
-          <th>Arrivals</th>
-          <th>Distance</th>
-          <th>AI Rec.</th>
-        </tr>
-      </thead>
-      <tbody>
-        {data.map((row, index) => {
-          const [mandi, price, minMax, arrivals, distance, rec] = row;
-          const isBest = index === 0;
-          const mandiName = mandi.split(' ').slice(0, -1).join(' ') || mandi;
-          const mandiState = mandi.split(' ').pop();
-          const priceClass = price >= 1400 ? 'up' : 'down';
-          const recClass = rec.includes('SELL') ? 'sell' : rec.includes('HOLD') ? 'hold' : rec.includes('AVOID') ? 'avoid' : 'watch';
-
-          return (
-            <tr key={index} className={isBest ? 'best-row' : ''} data-testid={`market-row-${index}`}>
+    <div style={{ overflowX: 'auto' }}>
+      <table className="data-table">
+        <thead>
+          <tr>
+            <th>Mandi</th>
+            <th>Price (₹/q)</th>
+            <th>Min</th>
+            <th>Max</th>
+            <th>Arrivals (q)</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((item, i) => (
+            <tr key={item.id || i}>
               <td>
-                <strong>{mandiName}</strong>
-                {mandiName !== mandi && <span className="mandi-state">{mandiState}</span>}
+                <strong>{item.mandi}</strong>
+                {item.state && <span style={{ display: 'block', fontSize: '0.72rem', color: 'var(--c-text-lt)' }}>{item.state}</span>}
               </td>
-              <td className={`price ${priceClass}`}>₹{price}</td>
-              <td className="price-range">{minMax}</td>
-              <td>{arrivals}</td>
-              <td>{distance}</td>
-              <td>
-                <span className={`rec-tag ${recClass}`}>{rec}</span>
+              <td style={{ fontWeight: 700, color: 'var(--c-primary)' }}>
+                ₹{Math.round(item.price_close).toLocaleString('en-IN')}
+              </td>
+              <td style={{ color: 'var(--c-text-lt)' }}>₹{Math.round(item.price_min).toLocaleString('en-IN')}</td>
+              <td style={{ color: 'var(--c-text-lt)' }}>₹{Math.round(item.price_max).toLocaleString('en-IN')}</td>
+              <td>{Math.round(item.arrivals_quintals).toLocaleString('en-IN')}</td>
+              <td style={{ fontSize: '0.82rem', color: 'var(--c-text-lt)' }}>
+                {new Date(item.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
               </td>
             </tr>
-          );
-        })}
-      </tbody>
-    </table>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
-};
-
-export default MarketTable;
+}
