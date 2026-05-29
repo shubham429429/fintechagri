@@ -3,7 +3,7 @@ services:
     name: agromind-backend
     env: python
     plan: free
-    rootDir: backend
+    rootDir: FintechAgri/backend
     buildCommand: pip install -r requirements.txt
     startCommand: python seed_db.py && uvicorn main:app --host 0.0.0.0
     envVars:
