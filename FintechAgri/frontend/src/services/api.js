@@ -72,4 +72,9 @@ export const userAPI = {
   updateProfile: (data) => apiFetch('/api/users/profile', { method: 'PUT', body: JSON.stringify(data) }),
 };
 
+export const nearbyAPI = {
+  getMarkets: (lat, lng, radiusKm = 100) =>
+    apiFetch(`/api/market/nearby?lat=${lat}&lng=${lng}&radius_km=${radiusKm}`),
+};
+
 export default apiFetch;

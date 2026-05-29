@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { marketAPI } from '../services/api';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import MarketTable from './MarketTable';
+import { formatPrice, unitLabel, convertPrice, UnitToggle } from '../utils/priceUtils';
 
 export default function CropMarket() {
   const [crops, setCrops] = useState([]);
@@ -11,6 +12,7 @@ export default function CropMarket() {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [unit, setUnit] = useState('quintal');
 
   const fetchData = async () => {
     setLoading(true);
@@ -40,6 +42,11 @@ export default function CropMarket() {
     })).sort((a, b) => a.rawDate.localeCompare(b.rawDate));
   })();
 
+  const displayChartData = chartData.map((d) => ({
+    ...d,
+    price: convertPrice(d.price, unit),
+  }));
+
   if (loading) return <div className="page-loading"><div className="spinner" /><p>Loading market data...</p></div>;
   if (error) return <div className="page-error"><p>⚠️ {error}</p><button className="btn btn-primary" onClick={fetchData}>Retry</button></div>;
 
@@ -49,6 +56,9 @@ export default function CropMarket() {
         <div>
           <h1 className="page-title">🏪 Crop Market Prices</h1>
           <p className="page-subtitle">Real-time mandi prices across India</p>
+        </div>
+        <div className="page-actions">
+          <UnitToggle unit={unit} setUnit={setUnit} />
         </div>
       </div>
 
@@ -67,11 +77,13 @@ export default function CropMarket() {
         <div className="kpi-grid">
           <div className="kpi-card">
             <div className="kpi-label">Latest Price</div>
-            <div className="kpi-value" style={{ color: 'var(--c-primary)' }}>₹{Math.round(summary.latest_price || 0).toLocaleString('en-IN')}</div>
+            <div className="kpi-value" style={{ color: 'var(--c-primary)' }}>{formatPrice(summary.latest_price, unit)}</div>
+            <div className="kpi-sub">{unitLabel(unit)}</div>
           </div>
           <div className="kpi-card">
             <div className="kpi-label">7-Day Average</div>
-            <div className="kpi-value" style={{ color: 'var(--c-primary)' }}>₹{Math.round(summary.avg_price_7d || 0).toLocaleString('en-IN')}</div>
+            <div className="kpi-value" style={{ color: 'var(--c-primary)' }}>{formatPrice(summary.avg_price_7d, unit)}</div>
+            <div className="kpi-sub">{unitLabel(unit)}</div>
           </div>
           <div className="kpi-card">
             <div className="kpi-label">Price Change</div>
@@ -87,18 +99,21 @@ export default function CropMarket() {
       )}
 
       {/* Price Chart */}
-      {chartData.length > 0 && (
+      {displayChartData.length > 0 && (
         <div className="card" style={{ marginBottom: '20px' }}>
           <div className="card-header">
             <h3 className="card-title">📈 {selectedCrop} — 30-Day Price Trend</h3>
           </div>
           <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={chartData}>
+            <LineChart data={displayChartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--c-border)" />
               <XAxis dataKey="date" tick={{ fill: 'var(--c-text-lt)', fontSize: 11 }} />
-              <YAxis tick={{ fill: 'var(--c-text-lt)', fontSize: 11 }} />
-              <Tooltip contentStyle={{ background: '#fff', border: '1px solid var(--c-border)', borderRadius: '8px' }} />
-              <Line type="monotone" dataKey="price" stroke="var(--c-primary)" strokeWidth={2.5} dot={false} name="Price (₹/q)" />
+              <YAxis tick={{ fill: 'var(--c-text-lt)', fontSize: 11 }} label={{ value: unitLabel(unit), angle: -90, position: 'insideLeft', style: { fill: 'var(--c-text-lt)', fontSize: 11 } }} />
+              <Tooltip
+                contentStyle={{ background: '#fff', border: '1px solid var(--c-border)', borderRadius: '8px' }}
+                formatter={(value) => [`${formatPrice(unit === 'kg' ? value * 100 : value, unit)}`, `Price (${unitLabel(unit)})`]}
+              />
+              <Line type="monotone" dataKey="price" stroke="var(--c-primary)" strokeWidth={2.5} dot={false} name={`Price (${unitLabel(unit)})`} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -109,7 +124,7 @@ export default function CropMarket() {
         <div className="card-header">
           <h3 className="card-title">Mandi-wise Prices — {selectedCrop}</h3>
         </div>
-        <MarketTable data={prices} />
+        <MarketTable data={prices} unit={unit} />
       </div>
     </div>
   );

@@ -5,6 +5,11 @@ import useAuthStore from '../stores/authStore';
 const CROPS = ['Onion', 'Tomato', 'Potato', 'Wheat', 'Soybean', 'Rice'];
 const MANDIS = ['Lasalgaon', 'Azadpur', 'Vashi', 'Pune', 'Nashik'];
 
+const CROP_EMOJI = {
+  Onion: '🧅', Tomato: '🍅', Potato: '🥔',
+  Wheat: '🌾', Soybean: '🫘', Rice: '🍚',
+};
+
 export default function Register() {
   const [form, setForm] = useState({
     name: '', phone: '', password: '', confirmPassword: '',
@@ -23,7 +28,9 @@ export default function Register() {
   const toggleCrop = (crop) => {
     setForm((prev) => ({
       ...prev,
-      crops: prev.crops.includes(crop) ? prev.crops.filter((c) => c !== crop) : [...prev.crops, crop],
+      crops: prev.crops.includes(crop)
+        ? prev.crops.filter((c) => c !== crop)
+        : [...prev.crops, crop],
     }));
   };
 
@@ -58,93 +65,196 @@ export default function Register() {
   };
 
   return (
-    <div className="login-page">
-      <div className="login-page-card" style={{ maxWidth: '580px' }}>
-        <div className="login-header">
-          <div className="login-logo">🌱</div>
-          <h1 className="login-title">Create Account</h1>
-          <p className="login-subtitle">Join AgroMind — Smart Farming Starts Here</p>
+    <div className="auth-split">
+      {/* ── LEFT VISUAL PANEL ── */}
+      <div className="auth-visual">
+        <div className="auth-visual__bg-shapes">
+          <div className="auth-visual__circle auth-visual__circle--1" />
+          <div className="auth-visual__circle auth-visual__circle--2" />
+          <div className="auth-visual__circle auth-visual__circle--3" />
         </div>
 
-        {error && <div className="alert-banner error">⚠️ {error}</div>}
+        <div className="auth-visual__content">
+          <div className="auth-visual__icon">🌱</div>
+          <h1 className="auth-visual__brand">Join AgroMind</h1>
+          <p className="auth-visual__tagline">Start your smart farming journey</p>
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-grid-2">
-            <div className="form-row">
-              <label>Full Name *</label>
-              <input placeholder="Your name" value={form.name} onChange={(e) => updateField('name', e.target.value)} />
-              {errors.name && <span className="field-error">{errors.name}</span>}
+          <div className="auth-visual__stats">
+            <div className="auth-stat-card">
+              <span className="auth-stat-card__icon">🌿</span>
+              <span className="auth-stat-card__value">6+</span>
+              <span className="auth-stat-card__label">Crops Tracked</span>
             </div>
-            <div className="form-row">
-              <label>Phone Number *</label>
-              <input type="tel" placeholder="10-digit number" maxLength={10} value={form.phone} onChange={(e) => updateField('phone', e.target.value)} />
-              {errors.phone && <span className="field-error">{errors.phone}</span>}
+            <div className="auth-stat-card">
+              <span className="auth-stat-card__icon">🏪</span>
+              <span className="auth-stat-card__value">5</span>
+              <span className="auth-stat-card__label">Mandis Connected</span>
+            </div>
+            <div className="auth-stat-card">
+              <span className="auth-stat-card__icon">📊</span>
+              <span className="auth-stat-card__value">900+</span>
+              <span className="auth-stat-card__label">Price Records</span>
             </div>
           </div>
+        </div>
 
-          <div className="form-grid-2">
-            <div className="form-row">
-              <label>Password *</label>
-              <input type="password" placeholder="Min 6 characters" value={form.password} onChange={(e) => updateField('password', e.target.value)} />
-              {errors.password && <span className="field-error">{errors.password}</span>}
-            </div>
-            <div className="form-row">
-              <label>Confirm Password *</label>
-              <input type="password" placeholder="Re-enter password" value={form.confirmPassword} onChange={(e) => updateField('confirmPassword', e.target.value)} />
-              {errors.confirmPassword && <span className="field-error">{errors.confirmPassword}</span>}
-            </div>
+        <div className="auth-visual__wheat">
+          {'🌾'.repeat(12)}
+        </div>
+      </div>
+
+      {/* ── RIGHT FORM PANEL ── */}
+      <div className="auth-form-panel auth-form-panel--register">
+        <div className="auth-form-wrapper auth-form-wrapper--register">
+          <div className="auth-form-header">
+            <h2 className="auth-form-header__title">Create Account</h2>
+            <p className="auth-form-header__sub">Fill in your details to get started</p>
           </div>
 
-          <div className="form-grid-2">
-            <div className="form-row">
-              <label>Farm Location</label>
-              <input placeholder="e.g., Nashik, Maharashtra" value={form.farm_location} onChange={(e) => updateField('farm_location', e.target.value)} />
-            </div>
-            <div className="form-row">
-              <label>Pin Code</label>
-              <input placeholder="6-digit pin" maxLength={6} value={form.pin_code} onChange={(e) => updateField('pin_code', e.target.value)} />
-              {errors.pin_code && <span className="field-error">{errors.pin_code}</span>}
-            </div>
-          </div>
+          {error && <div className="alert-banner error">⚠️ {error}</div>}
 
-          <div className="form-row">
-            <label>Crops You Grow</label>
-            <div className="crop-selector">
+          <form onSubmit={handleSubmit} className="auth-form">
+            {/* ── Account Details ── */}
+            <div className="auth-section-label">Account Details</div>
+            <div className="auth-form-grid">
+              <div className="auth-input-group">
+                <span className="auth-input-group__icon">👤</span>
+                <input
+                  placeholder="Full Name *"
+                  value={form.name}
+                  onChange={(e) => updateField('name', e.target.value)}
+                />
+                {errors.name && <span className="field-error">{errors.name}</span>}
+              </div>
+              <div className="auth-input-group">
+                <span className="auth-input-group__icon">📱</span>
+                <input
+                  type="tel"
+                  placeholder="Phone Number *"
+                  maxLength={10}
+                  value={form.phone}
+                  onChange={(e) => updateField('phone', e.target.value)}
+                />
+                {errors.phone && <span className="field-error">{errors.phone}</span>}
+              </div>
+              <div className="auth-input-group">
+                <span className="auth-input-group__icon">🔒</span>
+                <input
+                  type="password"
+                  placeholder="Password *"
+                  value={form.password}
+                  onChange={(e) => updateField('password', e.target.value)}
+                />
+                {errors.password && <span className="field-error">{errors.password}</span>}
+              </div>
+              <div className="auth-input-group">
+                <span className="auth-input-group__icon">🔑</span>
+                <input
+                  type="password"
+                  placeholder="Confirm Password *"
+                  value={form.confirmPassword}
+                  onChange={(e) => updateField('confirmPassword', e.target.value)}
+                />
+                {errors.confirmPassword && <span className="field-error">{errors.confirmPassword}</span>}
+              </div>
+            </div>
+
+            {/* ── Farm Details ── */}
+            <div className="auth-section-label">Farm Details</div>
+            <div className="auth-form-grid">
+              <div className="auth-input-group">
+                <span className="auth-input-group__icon">📍</span>
+                <input
+                  placeholder="Farm Location"
+                  value={form.farm_location}
+                  onChange={(e) => updateField('farm_location', e.target.value)}
+                />
+              </div>
+              <div className="auth-input-group">
+                <span className="auth-input-group__icon">📮</span>
+                <input
+                  placeholder="Pin Code"
+                  maxLength={6}
+                  value={form.pin_code}
+                  onChange={(e) => updateField('pin_code', e.target.value)}
+                />
+                {errors.pin_code && <span className="field-error">{errors.pin_code}</span>}
+              </div>
+            </div>
+
+            {/* ── Crops ── */}
+            <div className="auth-section-label">Crops You Grow</div>
+            <div className="auth-crop-grid">
               {CROPS.map((crop) => (
-                <label key={crop} className={`crop-chip ${form.crops.includes(crop) ? 'selected' : ''}`} onClick={() => toggleCrop(crop)}>
-                  <input type="checkbox" checked={form.crops.includes(crop)} readOnly />
-                  {crop}
-                </label>
+                <button
+                  key={crop}
+                  type="button"
+                  className={`auth-crop-chip ${form.crops.includes(crop) ? 'auth-crop-chip--active' : ''}`}
+                  onClick={() => toggleCrop(crop)}
+                >
+                  <span>{CROP_EMOJI[crop]}</span>
+                  <span>{crop}</span>
+                </button>
               ))}
             </div>
-          </div>
 
-          <div className="form-grid-3">
-            <div className="form-row">
-              <label>Farm Size (acres)</label>
-              <input type="number" step="0.5" min="0" placeholder="e.g., 5" value={form.farm_size_acres} onChange={(e) => updateField('farm_size_acres', e.target.value)} />
+            {/* ── Operations ── */}
+            <div className="auth-section-label">Operations</div>
+            <div className="auth-form-grid auth-form-grid--3">
+              <div className="auth-input-group">
+                <span className="auth-input-group__icon">📐</span>
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  placeholder="Farm Size (acres)"
+                  value={form.farm_size_acres}
+                  onChange={(e) => updateField('farm_size_acres', e.target.value)}
+                />
+              </div>
+              <div className="auth-input-group auth-input-group--select">
+                <span className="auth-input-group__icon">🏪</span>
+                <select
+                  value={form.preferred_mandi}
+                  onChange={(e) => updateField('preferred_mandi', e.target.value)}
+                >
+                  <option value="">Preferred Mandi</option>
+                  {MANDIS.map((m) => <option key={m} value={m}>{m}</option>)}
+                </select>
+              </div>
+              <div className="auth-input-group">
+                <span className="auth-input-group__icon">🏗️</span>
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="Storage (quintals)"
+                  value={form.storage_capacity_quintals}
+                  onChange={(e) => updateField('storage_capacity_quintals', e.target.value)}
+                />
+              </div>
             </div>
-            <div className="form-row">
-              <label>Preferred Mandi</label>
-              <select value={form.preferred_mandi} onChange={(e) => updateField('preferred_mandi', e.target.value)}>
-                <option value="">Select mandi</option>
-                {MANDIS.map((m) => <option key={m} value={m}>{m}</option>)}
-              </select>
-            </div>
-            <div className="form-row">
-              <label>Storage (quintals)</label>
-              <input type="number" min="0" placeholder="e.g., 50" value={form.storage_capacity_quintals} onChange={(e) => updateField('storage_capacity_quintals', e.target.value)} />
-            </div>
-          </div>
 
-          <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
-            {loading ? '⏳ Creating Account...' : '🌱 Create Account'}
-          </button>
-        </form>
+            <button
+              type="submit"
+              className="auth-submit-btn"
+              disabled={loading}
+            >
+              {loading ? (
+                <span className="auth-submit-btn__loading">
+                  <span className="auth-submit-btn__spinner" />
+                  Creating Account…
+                </span>
+              ) : (
+                '🌱 Create Account'
+              )}
+            </button>
+          </form>
 
-        <p className="login-note" style={{ textAlign: 'center', marginTop: '1rem' }}>
-          Already have an account? <Link to="/login" style={{ color: 'var(--c-primary)', fontWeight: 600 }}>Sign In</Link>
-        </p>
+          <p className="auth-switch-link">
+            Already have an account?{' '}
+            <Link to="/login">Sign In</Link>
+          </p>
+        </div>
       </div>
     </div>
   );

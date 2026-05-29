@@ -39,7 +39,7 @@ def generate_prices(days: int = 30):
         for mandi in MANDIS:
             price = cfg["base"] + random.uniform(-100, 100)
 
-            for day_offset in range(days, 0, -1):
+            for day_offset in range(days, -1, -1):
                 current_date = today - timedelta(days=day_offset)
 
                 # Random walk: ±3-8% daily variation

@@ -3,6 +3,7 @@ import { dashboardAPI, marketAPI } from '../services/api';
 import useAuthStore from '../stores/authStore';
 import KpiCard from './KpiCard';
 import MarketTable from './MarketTable';
+import { formatPrice, unitLabel, UnitToggle } from '../utils/priceUtils';
 
 export default function Dashboard() {
   const { user } = useAuthStore();
@@ -12,6 +13,11 @@ export default function Dashboard() {
   const [crops, setCrops] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [unit, setUnit] = useState('quintal');
+
+  const totalArrivals = summary?.total_arrivals_today 
+    ? Object.values(summary.total_arrivals_today).reduce((a, b) => a + b, 0) 
+    : 0;
 
   const fetchData = async () => {
     setLoading(true);
@@ -53,6 +59,9 @@ export default function Dashboard() {
           <h1 className="page-title">Welcome, {user?.name || 'Farmer'} <span className="wave">👋</span></h1>
           <p className="page-subtitle">{user?.farm_location ? `📍 ${user.farm_location}` : 'Your agricultural intelligence dashboard'}</p>
         </div>
+        <div className="page-actions">
+          <UnitToggle unit={unit} setUnit={setUnit} />
+        </div>
       </div>
 
       {/* KPI Cards */}
@@ -65,8 +74,8 @@ export default function Dashboard() {
         </KpiCard>
         <KpiCard
           label="Best Price Today"
-          value={summary?.best_price_today ? `₹${Math.round(summary.best_price_today.price).toLocaleString('en-IN')}` : 'N/A'}
-          delta={summary?.best_price_today ? `${summary.best_price_today.crop} @ ${summary.best_price_today.mandi}` : null}
+          value={summary?.best_price_today ? formatPrice(summary.best_price_today.price, unit) : 'N/A'}
+          delta={summary?.best_price_today ? `${summary.best_price_today.crop} @ ${summary.best_price_today.mandi} (${unitLabel(unit)})` : null}
           deltaType="up"
         />
         <KpiCard
@@ -79,6 +88,11 @@ export default function Dashboard() {
           label="Crops Tracked"
           value={summary?.crops_tracked || 0}
           delta="Active monitoring"
+        />
+        <KpiCard
+          label="Today's Arrivals"
+          value={`${totalArrivals.toLocaleString('en-IN')} q`}
+          delta="For your tracked crops"
         />
       </div>
 
@@ -108,7 +122,7 @@ export default function Dashboard() {
               {crops.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
-          <MarketTable data={prices} />
+          <MarketTable data={prices} unit={unit} />
         </div>
 
         {/* Quick Actions Card */}
@@ -136,6 +150,41 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+
+      {/* Nearby Market Produce */}
+      {summary?.nearby_produce_summary && summary.nearby_produce_summary.length > 0 && (
+        <div className="card" style={{ marginTop: '20px' }}>
+          <div className="card-header">
+            <h3 className="card-title">Nearby Market Produce (100km)</h3>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '15px' }}>
+            {summary.nearby_produce_summary.map(mandi => (
+              <div key={mandi.mandi} className="accent-card">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                  <h4 style={{ margin: 0, color: 'var(--c-primary)' }}>{mandi.mandi}</h4>
+                  <span className="badge">{mandi.distance_km} km</span>
+                </div>
+                <div style={{ fontSize: '0.9rem', color: 'var(--c-text-mid)' }}>
+                  Total Produce: <strong>{mandi.total_quintals.toLocaleString('en-IN')} q</strong>
+                </div>
+                <ul style={{ paddingLeft: '20px', marginTop: '10px', marginBottom: 0, fontSize: '0.85rem' }}>
+                  {mandi.produce.slice(0, 3).map(p => (
+                    <li key={p.crop}>
+                      {p.crop}: {p.quantity_quintals.toLocaleString('en-IN')} q 
+                      {p.latest_price ? ` @ ${formatPrice(p.latest_price, unit)}` : ''}
+                    </li>
+                  ))}
+                  {mandi.produce.length > 3 && (
+                    <li style={{ listStyle: 'none', color: 'var(--c-text-lt)', marginTop: '5px' }}>
+                      + {mandi.produce.length - 3} more crops
+                    </li>
+                  )}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

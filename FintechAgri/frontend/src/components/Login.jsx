@@ -20,54 +20,111 @@ export default function Login() {
   };
 
   return (
-    <div className="login-page">
-      <div className="login-page-card">
-        <div className="login-header">
-          <div className="login-logo">🌾</div>
-          <h1 className="login-title">AgroMind</h1>
-          <p className="login-subtitle">Agricultural Intelligence Platform</p>
+    <div className="auth-split">
+      {/* ── LEFT VISUAL PANEL ── */}
+      <div className="auth-visual">
+        <div className="auth-visual__bg-shapes">
+          <div className="auth-visual__circle auth-visual__circle--1" />
+          <div className="auth-visual__circle auth-visual__circle--2" />
+          <div className="auth-visual__circle auth-visual__circle--3" />
         </div>
 
-        {error && (
-          <div className="alert-banner error">⚠️ {error}</div>
-        )}
+        <div className="auth-visual__content">
+          <div className="auth-visual__icon">🌾</div>
+          <h1 className="auth-visual__brand">AgroMind</h1>
+          <p className="auth-visual__tagline">Smart Farming. Better Returns.</p>
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-row">
-            <label>Phone Number</label>
-            <input
-              type="tel"
-              placeholder="Enter 10-digit phone number"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              required
-              maxLength={10}
-            />
+          <div className="auth-visual__stats">
+            <div className="auth-stat-card">
+              <span className="auth-stat-card__icon">🌿</span>
+              <span className="auth-stat-card__value">6+</span>
+              <span className="auth-stat-card__label">Crops Tracked</span>
+            </div>
+            <div className="auth-stat-card">
+              <span className="auth-stat-card__icon">🏪</span>
+              <span className="auth-stat-card__value">5</span>
+              <span className="auth-stat-card__label">Mandis Connected</span>
+            </div>
+            <div className="auth-stat-card">
+              <span className="auth-stat-card__icon">📊</span>
+              <span className="auth-stat-card__value">900+</span>
+              <span className="auth-stat-card__label">Price Records</span>
+            </div>
+          </div>
+        </div>
+
+        {/* decorative wheat rows */}
+        <div className="auth-visual__wheat">
+          {'🌾'.repeat(12)}
+        </div>
+      </div>
+
+      {/* ── RIGHT FORM PANEL ── */}
+      <div className="auth-form-panel">
+        <div className="auth-form-wrapper">
+          <div className="auth-form-header">
+            <h2 className="auth-form-header__title">Welcome Back</h2>
+            <p className="auth-form-header__sub">Sign in to your account</p>
           </div>
 
-          <div className="form-row">
-            <label>Password</label>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={4}
-            />
+          {error && (
+            <div className="alert-banner error">⚠️ {error}</div>
+          )}
+
+          <form onSubmit={handleSubmit} className="auth-form">
+            <div className="auth-input-group">
+              <span className="auth-input-group__icon">📱</span>
+              <input
+                type="tel"
+                placeholder="Phone number"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                required
+                maxLength={10}
+              />
+            </div>
+
+            <div className="auth-input-group">
+              <span className="auth-input-group__icon">🔒</span>
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={4}
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="auth-submit-btn"
+              disabled={loading}
+            >
+              {loading ? (
+                <span className="auth-submit-btn__loading">
+                  <span className="auth-submit-btn__spinner" />
+                  Signing in…
+                </span>
+              ) : (
+                'Sign In'
+              )}
+            </button>
+          </form>
+
+          <p className="auth-switch-link">
+            Don't have an account?{' '}
+            <Link to="/register">Register</Link>
+          </p>
+
+          <div className="auth-demo-box">
+            <span className="auth-demo-box__label">Demo Credentials</span>
+            <span className="auth-demo-box__creds">
+              <span>📱 9999999999</span>
+              <span className="auth-demo-box__divider">|</span>
+              <span>🔒 demo123</span>
+            </span>
           </div>
-
-          <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
-            {loading ? '⏳ Signing in...' : '🚀 Sign In'}
-          </button>
-        </form>
-
-        <p className="login-note" style={{ textAlign: 'center', marginTop: '1rem' }}>
-          Don't have an account? <Link to="/register" style={{ color: 'var(--c-primary)', fontWeight: 600 }}>Register here</Link>
-        </p>
-
-        <div className="demo-credentials">
-          <strong>Demo:</strong> Phone: 9999999999 &nbsp;|&nbsp; Password: demo123
         </div>
       </div>
     </div>

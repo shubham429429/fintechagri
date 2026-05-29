@@ -10,6 +10,7 @@ import CropMarket from './components/CropMarket';
 import PriceForecast from './components/PriceForecast';
 import FarmInventory from './components/FarmInventory';
 import SocialHub from './components/SocialHub';
+import NearbyMarkets from './components/NearbyMarkets';
 import './index.css';
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
           <Route path="forecast" element={<PriceForecast />} />
           <Route path="inventory" element={<FarmInventory />} />
           <Route path="social" element={<SocialHub />} />
+          <Route path="nearby" element={<NearbyMarkets />} />
         </Route>
         <Route path="*" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} />} />
       </Routes>

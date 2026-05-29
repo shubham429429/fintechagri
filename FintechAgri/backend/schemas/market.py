@@ -56,3 +56,5 @@ class DashboardSummary(BaseModel):
     market_trend: str = "stable"  # 'up' | 'down' | 'stable'
     crops_tracked: int = 0
     recommendation: str = ""
+    total_arrivals_today: dict[str, float] = {}
+    nearby_produce_summary: list[dict] = []

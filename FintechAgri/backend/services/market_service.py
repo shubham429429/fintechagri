@@ -169,6 +169,23 @@ def get_dashboard_summary(db: Session, user: User) -> DashboardSummary:
             elif change < -2:
                 market_trend = "down"
 
+    # ---- total arrivals today for tracked crops -----------------------------
+    total_arrivals_today: dict[str, float] = {}
+    if user_crops:
+        arrivals_rows = (
+            db.query(MarketPrice.crop, func.sum(MarketPrice.arrivals_quintals))
+            .filter(MarketPrice.crop.in_(user_crops), MarketPrice.date == today)
+            .group_by(MarketPrice.crop)
+            .all()
+        )
+        for row in arrivals_rows:
+            total_arrivals_today[row[0]] = round(row[1] or 0.0, 1)
+
+    # ---- nearby markets summary ---------------------------------------------
+    # Use default Nashik location for demo
+    from routers.nearby import get_nearby_markets
+    nearby_produce_summary = get_nearby_markets(lat=19.9975, lng=73.7898, radius_km=100, db=db)
+
     # ---- recommendation -----------------------------------------------------
     recommendation = _build_recommendation(market_trend, best_price_today, total_stock_value)
 
@@ -178,6 +195,8 @@ def get_dashboard_summary(db: Session, user: User) -> DashboardSummary:
         market_trend=market_trend,
         crops_tracked=crops_tracked,
         recommendation=recommendation,
+        total_arrivals_today=total_arrivals_today,
+        nearby_produce_summary=nearby_produce_summary,
     )
 
 

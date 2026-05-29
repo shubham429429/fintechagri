@@ -6,6 +6,7 @@ const NAV_ITEMS = [
   { path: '/market', label: 'Crop Market', icon: '🏪' },
   { path: '/forecast', label: 'Price Trends', icon: '📈' },
   { path: '/inventory', label: 'Inventory', icon: '📦' },
+  { path: '/nearby', label: 'Nearby Markets', icon: '📍' },
   { path: '/social', label: 'Community', icon: '👥' },
 ];
 
