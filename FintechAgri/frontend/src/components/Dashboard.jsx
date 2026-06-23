@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
-import { dashboardAPI, marketAPI } from '../services/api';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { dashboardAPI, marketAPI, predictionsAPI } from '../services/api';
 import useAuthStore from '../stores/authStore';
 import KpiCard from './KpiCard';
 import MarketTable from './MarketTable';
 import { formatPrice, unitLabel, UnitToggle } from '../utils/priceUtils';
+
+const AUTO_REFRESH_INTERVAL = 60000; // 60 seconds
 
 export default function Dashboard() {
   const { user } = useAuthStore();
@@ -11,30 +13,38 @@ export default function Dashboard() {
   const [prices, setPrices] = useState([]);
   const [selectedCrop, setSelectedCrop] = useState('Onion');
   const [crops, setCrops] = useState([]);
+  const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [unit, setUnit] = useState('quintal');
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [alertsDismissed, setAlertsDismissed] = useState(false);
+  const intervalRef = useRef(null);
 
-  const totalArrivals = summary?.total_arrivals_today 
-    ? Object.values(summary.total_arrivals_today).reduce((a, b) => a + b, 0) 
+  const totalArrivals = summary?.total_arrivals_today
+    ? Object.values(summary.total_arrivals_today).reduce((a, b) => a + b, 0)
     : 0;
 
-  const fetchData = async () => {
-    setLoading(true);
+  const fetchData = useCallback(async () => {
+    setLoading((prev) => !summary ? true : prev); // Only show loader on first load
     setError(null);
     try {
-      const [summaryData, cropsData] = await Promise.all([
+      const [summaryData, cropsData, alertsData] = await Promise.all([
         dashboardAPI.getSummary(),
         marketAPI.getCrops(),
+        marketAPI.getAlerts(),
       ]);
       setSummary(summaryData);
       setCrops(cropsData);
+      setAlerts(alertsData);
+      setLastUpdated(new Date());
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, [summary]);
 
   const fetchPrices = async () => {
     try {
@@ -48,6 +58,25 @@ export default function Dashboard() {
   useEffect(() => { fetchData(); }, []);
   useEffect(() => { fetchPrices(); }, [selectedCrop]);
 
+  /* Auto-refresh toggle */
+  useEffect(() => {
+    if (autoRefresh) {
+      intervalRef.current = setInterval(() => {
+        fetchData();
+        fetchPrices();
+      }, AUTO_REFRESH_INTERVAL);
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    }
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [autoRefresh, selectedCrop]);
+
+  /* Alert severity icon */
+  const alertIcon = (type, severity) => {
+    if (type === 'oversupply') return severity === 'high' ? '🔴' : '🟡';
+    return severity === 'high' ? '📈' : '📊';
+  };
+
   if (loading) return <div className="page-loading"><div className="spinner" /><p>Loading dashboard...</p></div>;
   if (error) return <div className="page-error"><p>⚠️ {error}</p><button className="btn btn-primary" onClick={fetchData}>Retry</button></div>;
 
@@ -59,10 +88,79 @@ export default function Dashboard() {
           <h1 className="page-title">Welcome, {user?.name || 'Farmer'} <span className="wave">👋</span></h1>
           <p className="page-subtitle">{user?.farm_location ? `📍 ${user.farm_location}` : 'Your agricultural intelligence dashboard'}</p>
         </div>
-        <div className="page-actions">
+        <div className="page-actions" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          {/* Auto-refresh toggle */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '8px',
+            padding: '6px 14px', borderRadius: 'var(--radius-sm)',
+            background: autoRefresh ? '#e8f5e9' : 'var(--c-cream)',
+            border: `1px solid ${autoRefresh ? '#a5d6a7' : 'var(--c-border)'}`,
+            cursor: 'pointer', fontSize: '0.82rem', fontWeight: 500,
+            transition: 'all 0.2s',
+          }}
+          onClick={() => setAutoRefresh(!autoRefresh)}
+          >
+            <span style={{
+              display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%',
+              background: autoRefresh ? '#43a047' : '#bdbdbd',
+              animation: autoRefresh ? 'pulse 1.5s ease-in-out infinite' : 'none',
+            }} />
+            {autoRefresh ? 'Live' : 'Auto-refresh off'}
+          </div>
+          {lastUpdated && (
+            <span style={{ fontSize: '0.72rem', color: 'var(--c-text-lt)' }}>
+              Updated {lastUpdated.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+            </span>
+          )}
           <UnitToggle unit={unit} setUnit={setUnit} />
         </div>
       </div>
+
+      {/* Market Alerts Banner */}
+      {alerts.length > 0 && !alertsDismissed && (
+        <div style={{
+          background: 'linear-gradient(135deg, #fff8e1, #fff3e0)',
+          border: '1px solid #ffe082',
+          borderRadius: 'var(--radius)',
+          padding: '14px 20px',
+          marginBottom: '20px',
+          animation: 'fadeSlide 0.4s ease',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '1.2rem' }}>⚡</span>
+              <strong style={{ color: '#e65100', fontSize: '0.92rem' }}>Market Alerts ({alerts.length})</strong>
+            </div>
+            <button
+              onClick={() => setAlertsDismissed(true)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#bf360c', fontSize: '1.1rem' }}
+            >✕</button>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {alerts.slice(0, 3).map((alert, i) => (
+              <div key={i} style={{
+                display: 'flex', alignItems: 'center', gap: '10px',
+                padding: '8px 12px', borderRadius: 'var(--radius-sm)',
+                background: alert.type === 'oversupply' ? 'rgba(255,152,0,0.08)' : 'rgba(76,175,80,0.08)',
+                fontSize: '0.85rem',
+              }}>
+                <span>{alertIcon(alert.type, alert.severity)}</span>
+                <span style={{ color: 'var(--c-text)', flex: 1 }}>{alert.message}</span>
+                <span style={{
+                  padding: '2px 8px', borderRadius: '10px', fontSize: '0.7rem', fontWeight: 600,
+                  background: alert.severity === 'high' ? '#ffcdd2' : '#fff9c4',
+                  color: alert.severity === 'high' ? '#c62828' : '#f57f17',
+                }}>{alert.severity}</span>
+              </div>
+            ))}
+            {alerts.length > 3 && (
+              <p style={{ fontSize: '0.78rem', color: 'var(--c-text-lt)', margin: '4px 0 0', paddingLeft: '30px' }}>
+                + {alerts.length - 3} more alerts
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* KPI Cards */}
       <div className="kpi-grid">
@@ -85,9 +183,10 @@ export default function Dashboard() {
           deltaType={summary?.market_trend === 'up' ? 'up' : summary?.market_trend === 'down' ? 'down' : null}
         />
         <KpiCard
-          label="Crops Tracked"
-          value={summary?.crops_tracked || 0}
-          delta="Active monitoring"
+          label="Active Alerts"
+          value={alerts.length > 0 ? `${alerts.length}` : '0'}
+          delta={alerts.length > 0 ? `${alerts.filter((a) => a.type === 'oversupply').length} oversupply, ${alerts.filter((a) => a.type === 'shortage').length} shortage` : 'No active alerts'}
+          deltaType={alerts.length > 0 ? 'down' : 'up'}
         />
         <KpiCard
           label="Today's Arrivals"
@@ -170,7 +269,7 @@ export default function Dashboard() {
                 <ul style={{ paddingLeft: '20px', marginTop: '10px', marginBottom: 0, fontSize: '0.85rem' }}>
                   {mandi.produce.slice(0, 3).map(p => (
                     <li key={p.crop}>
-                      {p.crop}: {p.quantity_quintals.toLocaleString('en-IN')} q 
+                      {p.crop}: {p.quantity_quintals.toLocaleString('en-IN')} q
                       {p.latest_price ? ` @ ${formatPrice(p.latest_price, unit)}` : ''}
                     </li>
                   ))}
@@ -185,6 +284,14 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* CSS for pulse animation */}
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(1.3); }
+        }
+      `}</style>
     </div>
   );
 }

@@ -25,6 +25,10 @@ from schemas.inventory import (  # noqa: F401
     CommentCreate,
     CommentResponse,
 )
+from schemas.prediction import (  # noqa: F401
+    PredictionResponse,
+    FarmerRecommendation,
+)
 
 __all__ = [
     "UserCreate",
@@ -46,4 +50,7 @@ __all__ = [
     "PostResponse",
     "CommentCreate",
     "CommentResponse",
+    "PredictionResponse",
+    "FarmerRecommendation",
 ]
+

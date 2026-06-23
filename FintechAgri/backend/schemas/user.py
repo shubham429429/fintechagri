@@ -41,6 +41,8 @@ class UserUpdate(BaseModel):
     farm_size_acres: Optional[float] = None
     preferred_mandi: Optional[str] = None
     storage_capacity_quintals: Optional[float] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
 
 # ── Response Schemas ─────────────────────────────────────────────────────────
@@ -58,6 +60,9 @@ class UserResponse(BaseModel):
     farm_size_acres: Optional[float] = None
     preferred_mandi: Optional[str] = None
     storage_capacity_quintals: float = 0
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    profile_photo_url: Optional[str] = None
     created_at: datetime
 
     model_config = {"from_attributes": True}
@@ -83,6 +88,9 @@ class UserResponse(BaseModel):
                         "farm_size_acres": data.farm_size_acres,
                         "preferred_mandi": data.preferred_mandi,
                         "storage_capacity_quintals": data.storage_capacity_quintals,
+                        "latitude": getattr(data, "latitude", None),
+                        "longitude": getattr(data, "longitude", None),
+                        "profile_photo_url": getattr(data, "profile_photo_url", None),
                         "created_at": data.created_at,
                     }
                     return d

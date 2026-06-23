@@ -1,4 +1,4 @@
-"""Inventory CRUD endpoints."""
+"""Inventory CRUD endpoints with stock history tracking, freshness, and depletion."""
 
 from typing import Annotated
 
@@ -15,6 +15,13 @@ from schemas.inventory import (
     InventoryUpdate,
 )
 from services.auth_service import get_current_user
+from services.inventory_service import (
+    calculate_depletion,
+    calculate_freshness,
+    get_farmer_stock_history,
+    get_stock_history,
+    log_stock_change,
+)
 
 router = APIRouter(prefix="/api/inventory", tags=["Inventory"])
 
@@ -53,6 +60,18 @@ def create_item(
     db.add(item)
     db.commit()
     db.refresh(item)
+
+    # Log stock creation in history
+    log_stock_change(
+        db,
+        inventory_id=item.id,
+        farmer_id=current_user.id,
+        crop=item.crop,
+        quantity_before=0,
+        quantity_after=item.quantity_quintals,
+        change_type="created",
+    )
+
     return item
 
 
@@ -70,12 +89,27 @@ def update_item(
     if not item:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
 
+    old_qty = item.quantity_quintals
+
     update_data = payload.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(item, field, value)
 
     db.commit()
     db.refresh(item)
+
+    # Log stock change if quantity changed
+    if "quantity_quintals" in update_data and update_data["quantity_quintals"] != old_qty:
+        log_stock_change(
+            db,
+            inventory_id=item.id,
+            farmer_id=current_user.id,
+            crop=item.crop,
+            quantity_before=old_qty,
+            quantity_after=item.quantity_quintals,
+            change_type="updated",
+        )
+
     return item
 
 
@@ -91,6 +125,17 @@ def delete_item(
     ).first()
     if not item:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
+
+    # Log deletion
+    log_stock_change(
+        db,
+        inventory_id=item.id,
+        farmer_id=current_user.id,
+        crop=item.crop,
+        quantity_before=item.quantity_quintals,
+        quantity_after=0,
+        change_type="sold",
+    )
 
     db.delete(item)
     db.commit()
@@ -117,3 +162,59 @@ def inventory_summary(
         total_value=total_value,
         items_by_crop=items_by_crop,
     )
+
+
+# ── New Phase 1 Endpoints ───────────────────────────────────────────────────
+
+
+@router.get("/history")
+def get_all_stock_history(
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Session = Depends(get_db),
+):
+    """Get stock change history for the authenticated farmer."""
+    return get_farmer_stock_history(db, current_user.id)
+
+
+@router.get("/history/{item_id}")
+def get_item_history(
+    item_id: int,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Session = Depends(get_db),
+):
+    """Get stock change history for a specific inventory item."""
+    item = db.query(Inventory).filter(
+        Inventory.id == item_id, Inventory.user_id == current_user.id
+    ).first()
+    if not item:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
+    return get_stock_history(db, item_id)
+
+
+@router.get("/freshness")
+def get_freshness(
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Session = Depends(get_db),
+):
+    """Calculate freshness for all inventory items."""
+    items = db.query(Inventory).filter(Inventory.user_id == current_user.id).all()
+    return [
+        {
+            "inventory_id": item.id,
+            "crop": item.crop,
+            "quantity_quintals": item.quantity_quintals,
+            "storage_location": item.storage_location,
+            **calculate_freshness(item.harvest_date, item.crop),
+        }
+        for item in items
+    ]
+
+
+@router.get("/depletion")
+def get_depletion(
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Session = Depends(get_db),
+):
+    """Estimate depletion rates and days until stock is exhausted."""
+    return calculate_depletion(db, current_user.id)
+

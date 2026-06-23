@@ -21,6 +21,9 @@ class User(Base):
     farm_size_acres: Mapped[float | None] = mapped_column(Float, nullable=True)
     preferred_mandi: Mapped[str | None] = mapped_column(String(100), nullable=True)
     storage_capacity_quintals: Mapped[float] = mapped_column(Float, default=0)
+    latitude: Mapped[float | None] = mapped_column(Float, nullable=True)
+    longitude: Mapped[float | None] = mapped_column(Float, nullable=True)
+    profile_photo_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=lambda: datetime.now(timezone.utc)
     )

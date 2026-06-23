@@ -22,6 +22,7 @@ const apiFetch = async (endpoint, options = {}) => {
     const err = await res.json().catch(() => ({ detail: 'Request failed' }));
     throw new Error(err.detail || 'Request failed');
   }
+  if (res.status === 204) return null;
   return res.json();
 };
 
@@ -39,6 +40,17 @@ export const marketAPI = {
   },
   getCrops: () => apiFetch('/api/market/crops'),
   getCropSummary: (crop) => apiFetch(`/api/market/summary/${crop}`),
+  getVolatility: (crop, mandi, days = 7) => {
+    const params = new URLSearchParams({ days: String(days) });
+    if (mandi) params.append('mandi', mandi);
+    return apiFetch(`/api/market/volatility/${crop}?${params}`);
+  },
+  getAlerts: () => apiFetch('/api/market/alerts'),
+  getTrend: (crop, days = 7, mandi) => {
+    const params = new URLSearchParams({ days: String(days) });
+    if (mandi) params.append('mandi', mandi);
+    return apiFetch(`/api/market/trend/${crop}?${params}`);
+  },
 };
 
 export const dashboardAPI = {
@@ -51,6 +63,10 @@ export const inventoryAPI = {
   update: (id, data) => apiFetch(`/api/inventory/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   delete: (id) => apiFetch(`/api/inventory/${id}`, { method: 'DELETE' }),
   getSummary: () => apiFetch('/api/inventory/summary'),
+  getHistory: () => apiFetch('/api/inventory/history'),
+  getItemHistory: (itemId) => apiFetch(`/api/inventory/history/${itemId}`),
+  getFreshness: () => apiFetch('/api/inventory/freshness'),
+  getDepletion: () => apiFetch('/api/inventory/depletion'),
 };
 
 export const postsAPI = {
@@ -70,11 +86,43 @@ export const postsAPI = {
 export const userAPI = {
   getProfile: () => apiFetch('/api/users/profile'),
   updateProfile: (data) => apiFetch('/api/users/profile', { method: 'PUT', body: JSON.stringify(data) }),
+  updateLocation: (lat, lng) =>
+    apiFetch(`/api/users/location?lat=${lat}&lng=${lng}`, { method: 'POST' }),
+  uploadPhoto: async (file) => {
+    const token = getToken();
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch(`${API_URL}/api/users/photo`, {
+      method: 'POST',
+      headers: { ...(token && { 'Authorization': `Bearer ${token}` }) },
+      body: formData,
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Upload failed' }));
+      throw new Error(err.detail || 'Upload failed');
+    }
+    return res.json();
+  },
 };
 
 export const nearbyAPI = {
   getMarkets: (lat, lng, radiusKm = 100) =>
     apiFetch(`/api/market/nearby?lat=${lat}&lng=${lng}&radius_km=${radiusKm}`),
+};
+
+export const predictionsAPI = {
+  getMandiForecasts: (mandi) => apiFetch(`/api/predictions/${mandi}`),
+  getCropForecast: (mandi, crop, days = 7) =>
+    apiFetch(`/api/predictions/${mandi}/${crop}?days=${days}`),
+  getRecommendation: (farmerId) => apiFetch(`/api/predictions/recommendation/${farmerId}`),
+};
+
+export const clusterAPI = {
+  getNearbyFarmers: (lat, lng, radiusKm = 100) =>
+    apiFetch(`/api/cluster/nearby?lat=${lat}&lng=${lng}&radius_km=${radiusKm}`),
+  getClusters: (nClusters = 5) => apiFetch(`/api/cluster/clusters?n_clusters=${nClusters}`),
+  getClusterStock: (clusterId) => apiFetch(`/api/cluster/clusters/${clusterId}/stock`),
+  getMandiRanking: () => apiFetch('/api/cluster/mandi-ranking'),
 };
 
 export default apiFetch;
